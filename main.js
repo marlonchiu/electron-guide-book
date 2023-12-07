@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron')
+const { app, BrowserWindow, ipcMain, nativeTheme, Menu, MenuItem } = require('electron')
 // include the Node.js 'path' module at the top of your file
 const path = require('node:path')
 
@@ -50,6 +50,26 @@ const createWindow = () => {
   // 打开开发工具
   mainWindow.webContents.openDevTools()
 }
+
+const menu = new Menu()
+menu.append(
+  new MenuItem({
+    label: 'Electron',
+    submenu: [
+      {
+        role: 'help',
+        accelerator: process.platform === 'darwin' ? 'Alt+Cmd+I' : 'Alt+Shift+I',
+        click: () => {
+          // 主线程接收事件响应
+          console.log('主线程接收事件响应')
+          console.log('Electron rocks!')
+        }
+      }
+    ]
+  })
+)
+
+Menu.setApplicationMenu(menu)
 
 ipcMain.handle('dark-mode:toggle', () => {
   if (nativeTheme.shouldUseDarkColors) {

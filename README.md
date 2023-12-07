@@ -7,4 +7,6 @@
 
 # 示例预览
 
-> [示例预览](https://www.electronjs.org/zh/docs/latest/tutorial/examples)
+> [官方示例预览](https://www.electronjs.org/zh/docs/latest/tutorial/examples)
+
+> [键盘快捷键](https://www.electronjs.org/zh/docs/latest/tutorial/keyboard-shortcuts)
