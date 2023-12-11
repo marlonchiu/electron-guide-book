@@ -1,12 +1,10 @@
-const { app, BrowserWindow, ipcMain, nativeTheme, Menu, MenuItem } = require('electron')
-// include the Node.js 'path' module at the top of your file
+const { app, BrowserWindow, ipcMain } = require('electron/main')
 const path = require('node:path')
+const fs = require('node:fs')
+const https = require('node:https')
 
-let bluetoothPinCallback
-let selectBluetoothCallback
-
-const createWindow = () => {
-  const mainWindow = new BrowserWindow({
+function createWindow() {
+  const win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -14,91 +12,41 @@ const createWindow = () => {
     }
   })
 
-  mainWindow.webContents.on('select-bluetooth-device', (event, deviceList, callback) => {
-    event.preventDefault()
-    // 此处出现所有蓝牙设备列表
-    console.log('_____deviceList:', deviceList)
-    selectBluetoothCallback = callback
-    const result = deviceList.find((device) => {
-      return device.deviceName === 'HBB8894016844SOC091'
-    })
-    if (result) {
-      callback(result.deviceId)
-    } else {
-      // The device wasn't found so we need to either wait longer (eg until the
-      // device is turned on) or until the user cancels the request
-    }
-  })
-
-  ipcMain.on('cancel-bluetooth-request', (event) => {
-    selectBluetoothCallback('')
-  })
-
-  // Listen for a message from the renderer to get the response for the Bluetooth pairing.
-  ipcMain.on('bluetooth-pairing-response', (event, response) => {
-    bluetoothPinCallback(response)
-  })
-
-  mainWindow.webContents.session.setBluetoothPairingHandler((details, callback) => {
-    bluetoothPinCallback = callback
-    // Send a message to the renderer to prompt the user to confirm the pairing.
-    mainWindow.webContents.send('bluetooth-pairing-request', details)
-  })
-
-  mainWindow.loadFile('index.html')
+  win.loadFile('./index.html')
 
   // 打开开发工具
-  mainWindow.webContents.openDevTools()
+  win.webContents.openDevTools()
 }
 
-const menu = new Menu()
-menu.append(
-  new MenuItem({
-    label: 'Electron',
-    submenu: [
-      {
-        role: 'help',
-        accelerator: process.platform === 'darwin' ? 'Alt+Cmd+I' : 'Alt+Shift+I',
-        click: () => {
-          // 主线程接收事件响应
-          console.log('主线程接收事件响应')
-          console.log('Electron rocks!')
-        }
-      }
-    ]
-  })
-)
+const iconName = path.join(__dirname, 'iconForDragAndDrop.png')
+const icon = fs.createWriteStream(iconName)
 
-Menu.setApplicationMenu(menu)
+// Create a new file to copy - you can also copy existing files.
+fs.writeFileSync(path.join(__dirname, 'drag-and-drop-1.md'), '# First file to test drag and drop')
+fs.writeFileSync(path.join(__dirname, 'drag-and-drop-2.md'), '# Second file to test drag and drop')
 
-ipcMain.handle('dark-mode:toggle', () => {
-  if (nativeTheme.shouldUseDarkColors) {
-    nativeTheme.themeSource = 'light'
-  } else {
-    nativeTheme.themeSource = 'dark'
-  }
-  return nativeTheme.shouldUseDarkColors
+https.get('https://img.icons8.com/ios/452/drag-and-drop.png', (response) => {
+  console.log('🚀 ~ file: main.js:26 ~ https.get ~ response:', response)
+  response.pipe(icon)
 })
 
-ipcMain.handle('dark-mode:system', () => {
-  nativeTheme.themeSource = 'system'
-})
+app.whenReady().then(createWindow)
 
-app.whenReady().then(() => {
-  ipcMain.handle('ping', () => 'pong')
-
-  createWindow()
-
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+ipcMain.on('ondragstart', (event, filePath) => {
+  event.sender.startDrag({
+    file: path.join(__dirname, filePath),
+    icon: iconName
   })
 })
 
-// 除了 macOS 外，当所有窗口都被关闭的时候退出程序。 因此, 通常
-// 对应用程序和它们的菜单栏来说应该时刻保持激活状态,
-// 直到用户使用 Cmd + Q 明确退出
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
+})
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow()
+  }
 })
