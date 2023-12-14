@@ -2,28 +2,32 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
     <title>Hello World!</title>
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link rel="stylesheet" type="text/css" href="./styles.css" />
   </head>
   <body>
     <h1>Hello World!</h1>
-    <p>
-      Drag the boxes below to somewhere in your OS (Finder/Explorer, Desktop, etc.) to copy an example markdown file.
-    </p>
-    <div
-      style="border: 2px solid black; border-radius: 3px; padding: 5px; display: inline-block"
-      draggable="true"
-      id="drag1"
-    >
-      Drag me - File 1
-    </div>
-    <div
-      style="border: 2px solid black; border-radius: 3px; padding: 5px; display: inline-block"
-      draggable="true"
-      id="drag2"
-    >
-      Drag me - File 2
-    </div>
-    <script src="renderer.js"></script>
+    We are using Node.js <span id="node-version"></span>, Chromium <span id="chrome-version"></span>, and Electron
+    <span id="electron-version"></span>.
+
+    <hr />
+    <p id="info"></p>
+    <p>Current theme source: <strong id="theme-source">System</strong></p>
+
+    <hr />
+    <button id="toggle-dark-mode">Toggle Dark Mode</button>
+    <button id="reset-to-system">Reset to System Theme</button>
+
+    <hr />
+    <button id="test-bluetooth">Test Bluetooth</button>
+    <button id="cancel-bluetooth">Cancel Bluetooth Request</button>
+    <p>Currently selected bluetooth device: <strong id="device-name"></strong></p>
+
+    <hr />
+    <p>Hit Alt+Shift+I on Windows, or Opt+Cmd+I on mac to see a message printed to the console.</p>
+
+    <script src="./renderer.js"></script>
   </body>
 </html>

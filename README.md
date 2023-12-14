@@ -10,3 +10,5 @@
 > [官方示例预览](https://www.electronjs.org/zh/docs/latest/tutorial/examples)
 
 > [键盘快捷键](https://www.electronjs.org/zh/docs/latest/tutorial/keyboard-shortcuts)
+
+通知：主进程通知使用 Electron 的 `通知模块` 显示。 使用此模块创建的通知对象不会立刻显示，除非调用他们的 show() 实例 方法。
